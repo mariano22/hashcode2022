@@ -42,16 +42,19 @@ int n_contributors = 0;
 struct contributor {
     string name;
     int idx;
-    vector<pair<string, int>> skills;
-
+    map<string, int> skills;
+    //vector<pair<string, int>> skills;
 };
 
 istream& operator>>(istream &in, contributor &c) {
     in >> c.name;
     c.idx = n_contributors++;
     int k; in >> k;
-    c.skills.resize(k);
-    for (auto &[x,y] : c.skills) in >> x >> y;
+    while (k--) {
+        string skill; int level;
+        in >> skill >> level;
+        c.skills[skill] = level;
+    }
     return in;
 }
 
@@ -85,11 +88,17 @@ int get(const vector<string> &name, const string &s) {
 int C, P;
 vector<contributor> cont;
 vector<project> proj;
+map<string, vi> workers;
+vector<bool> busy;
 
 void read_input() {
     cin >> C >> P;
     cont.resize(C);
-    for (auto &x : cont) cin >> x;
+    for (auto &x : cont) {
+        cin >> x;
+    }
+
+    busy = vector<bool>(C);
 
     proj.resize(P);
     for (auto &x : proj) cin >> x;
@@ -98,6 +107,42 @@ void read_input() {
 }
 
 void solve() {
+
+    vector<pair<string, vector<string>> ans;
+
+    for (auto p : proj) {
+
+        vi workers;
+        bool failed = false;
+        for (auto &[skill, level] : p.skills) {
+            int pick = -1, min_level = 1e9;
+            forn(idx, C) if (!busy[idx]) {
+                int has_level = cont[idx].skills[skill];
+                if (has_level < level) continue;
+
+                if (pick == -1 || has_level < min_level) {
+                    pick = idx;
+                    min_level = has_level;
+                }
+            }
+
+            if  (pick == -1) {
+                failed = true;
+                break;
+            }
+            workers.pb(idx);
+        }
+
+        if (!failed) {
+
+        }
+    }
+
+    for (auto &[p, cs] : ans) {
+        cout << p << endl;
+        for (auto &c : cs) cout << c << ' ';
+        cout << endl;
+    }
 }
 
 int main() {
