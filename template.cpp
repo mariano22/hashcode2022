@@ -117,6 +117,8 @@ struct state {
 
 };
 
+bool EXPONENTIAL_ANNEALING = true;
+
 void simulated_annealing(state &s, double seconds, double high=10, double low=0) {
     using namespace std::chrono;
 
@@ -124,7 +126,10 @@ void simulated_annealing(state &s, double seconds, double high=10, double low=0)
 
     double energy = s.value();
     uniform_real_distribution<double> dist(0.0, 1.0);
-
+    double T;
+    if (EXPONENTIAL_ANNEALING) {
+        T = high;
+    }
     while (true) {
         steady_clock::time_point now = steady_clock::now();
         double elapsed = duration_cast<duration<double>>(now - start).count();
@@ -132,7 +137,11 @@ void simulated_annealing(state &s, double seconds, double high=10, double low=0)
 
         s.step();
         double new_energy = s.value();
-        double T = (elapsed * low + (seconds-elapsed) * high) / seconds; 
+        if (EXPONENTIAL_ANNEALING) {
+            T = T * low;     
+        } else {
+            T = (elapsed * low + (seconds-elapsed) * high) / seconds; 
+        }
         double prob = exp((new_energy - energy) / T);
 
         if (dist(rng) < prob) {
@@ -193,7 +202,11 @@ void solve(double alloted_time) {
     vector<bool> ans(si(ingredients));
     forn(i, si(ans)) ans[i] = rng() % 2;
     state s(ans);
-    simulated_annealing(s, alloted_time);
+    if (EXPONENTIAL_ANNEALING) {
+        simulated_annealing(s, alloted_time, 1e9, 0.99999);
+    } else {
+        simulated_annealing(s, alloted_time);
+    }
     
     D(s.value());
     
@@ -207,15 +220,16 @@ void solve(double alloted_time) {
 int main() {
     #ifdef DEBUG
         //~ freopen("./in/a_an_example.in", "r", stdin);
-        freopen("./in/b_basic.in", "r", stdin);
+        //~ freopen("./in/b_basic.in", "r", stdin);
         //~ freopen("./in/c_coarse.in", "r", stdin);
         //~ freopen("./in/d_difficult.in", "r", stdin);
-        //~ freopen("./in/e_elaborate.in", "r", stdin);
+        freopen("./in/e_elaborate.in", "r", stdin);
     #endif
     ios_base::sync_with_stdio(0); cin.tie(0);
 
     read_input();
+    
     solve(120);
-
+    
     return 0;
 }
