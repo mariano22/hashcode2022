@@ -107,6 +107,8 @@ void read_input() {
     sort(all(proj));
 }
 
+const int INF = 1e9;
+
 void solve() {
 
     vector<pair<string, vi>> ans;
@@ -117,6 +119,8 @@ void solve() {
 
         vi workers;
         bool failed = false;
+
+        int proj_start = 0;
         for (auto &[skill, level] : p.skills) {
             int pick = -1, min_level = 1e9;
             forn(idx, C) if (busy[idx] <= should_shart) {
@@ -133,10 +137,16 @@ void solve() {
                 failed = true;
                 break;
             }
+
             workers.pb(pick);
+            proj_start = max(proj_start, busy[pick]);
+            busy[pick] = INF;
         }
 
-        if (!failed) ans.eb(p.name, workers);
+        if (!failed) {
+            ans.eb(p.name, workers);
+            for (auto idx : workers) busy[idx] = proj_start + p.takes;
+        }
     }
 
     cout << si(ans) << endl;
