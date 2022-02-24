@@ -89,7 +89,7 @@ int C, P;
 vector<contributor> cont;
 vector<project> proj;
 map<string, vi> workers;
-vector<bool> busy;
+vi busy;
 
 void read_input() {
     cin >> C >> P;
@@ -98,7 +98,8 @@ void read_input() {
         cin >> x;
     }
 
-    busy = vector<bool>(C);
+    busy = vi(C);
+    //busy = vector<bool>(C);
 
     proj.resize(P);
     for (auto &x : proj) cin >> x;
@@ -108,19 +109,21 @@ void read_input() {
 
 void solve() {
 
-    vector<pair<string, vector<string>> ans;
+    vector<pair<string, vi>> ans;
 
     for (auto p : proj) {
+
+        auto should_shart = p.before - p.takes + 1;
 
         vi workers;
         bool failed = false;
         for (auto &[skill, level] : p.skills) {
             int pick = -1, min_level = 1e9;
-            forn(idx, C) if (!busy[idx]) {
+            forn(idx, C) if (busy[idx] <= should_shart) {
                 int has_level = cont[idx].skills[skill];
                 if (has_level < level) continue;
 
-                if (pick == -1 || has_level < min_level) {
+                if (pick == -1 || has_level < min_level) { // change has_level for contrib.value()
                     pick = idx;
                     min_level = has_level;
                 }
@@ -130,17 +133,16 @@ void solve() {
                 failed = true;
                 break;
             }
-            workers.pb(idx);
+            workers.pb(pick);
         }
 
-        if (!failed) {
-
-        }
+        if (!failed) ans.eb(p.name, workers);
     }
 
+    cout << si(ans) << endl;
     for (auto &[p, cs] : ans) {
         cout << p << endl;
-        for (auto &c : cs) cout << c << ' ';
+        for (auto idx : cs) cout << cont[idx].name << ' ';
         cout << endl;
     }
 }
