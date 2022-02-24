@@ -6,7 +6,7 @@ echo "Using solution ${SOL}.cpp"
 g++ -O3 -w -o $SOL.out -DDEBUG -std=c++17 $SOL.cpp
 chmod +x $SOL.out
 
-for filepath in ./in/*.in; do
+for filepath in ./in/*.in.txt; do
     echo ""
     echo ""
     filename="${filepath##*/}"
