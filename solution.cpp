@@ -24,7 +24,7 @@ typedef pair<int,int> pii;
 #define all(c) (c).begin(), (c).end()
 
 #ifdef DEBUG
-    #define D(v) cout << #v"=" << v << endl //;)
+    #define D(v) cerr << #v"=" << v << endl //;)
     #define dpr(v) cout << #v"=" << v << endl //;)
     #define dpra(a,n) { forn(i,(n)) cout << (a)[i] << (i==(n)-1?'\n':' '); }
     #define dprv(vec) dpra(vec,si(vec))
@@ -65,7 +65,7 @@ struct project {
     vector<pair<string, int>> skills;
 
     bool operator<(const project &o) const {
-        return before < o.before;
+        return score > o.score;
     }
 };
 
@@ -113,17 +113,18 @@ void solve() {
 
     vector<pair<string, vi>> ans;
 
+    ll score = 0;
     for (auto p : proj) {
-
         auto should_shart = p.before - p.takes + 1;
 
         vi workers;
         bool failed = false;
 
         int proj_start = 0;
+        set<int> used;
         for (auto &[skill, level] : p.skills) {
             int pick = -1, min_level = 1e9;
-            forn(idx, C) if (busy[idx] <= should_shart) {
+            forn(idx, C) if (busy[idx] <= should_shart && !used.count(idx)) {
                 int has_level = cont[idx].skills[skill];
                 if (has_level < level) continue;
 
@@ -139,13 +140,20 @@ void solve() {
             }
 
             workers.pb(pick);
+            used.insert(pick);
             proj_start = max(proj_start, busy[pick]);
-            busy[pick] = INF;
         }
 
         if (!failed) {
+            score += p.score;
             ans.eb(p.name, workers);
-            for (auto idx : workers) busy[idx] = proj_start + p.takes;
+            forn(i, si(workers)) {
+                int idx = workers[i];
+                busy[idx] = proj_start + p.takes;
+                auto &[s,need] = p.skills[i];
+                auto &have = cont[idx].skills[s];
+                if (have == need) ++have;
+            }
         }
     }
 
@@ -155,6 +163,7 @@ void solve() {
         for (auto idx : cs) cout << cont[idx].name << ' ';
         cout << endl;
     }
+    cerr << "score: " << score << endl;
 }
 
 int main() {
