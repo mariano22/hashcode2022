@@ -25,8 +25,8 @@ typedef pair<int,int> pii;
 
 #ifdef DEBUG
     #define D(v) cerr << #v"=" << v << endl //;)
-    #define dpr(v) cout << #v"=" << v << endl //;)
-    #define dpra(a,n) { forn(i,(n)) cout << (a)[i] << (i==(n)-1?'\n':' '); }
+    #define dpr(v) cerr << #v"=" << v << endl //;)
+    #define dpra(a,n) { forn(i,(n)) cerr << (a)[i] << (i==(n)-1?'\n':' '); }
     #define dprv(vec) dpra(vec,si(vec))
 
 #else
@@ -65,7 +65,7 @@ struct project {
     vector<pair<string, int>> skills;
 
     bool operator<(const project &o) const {
-        return score > o.score;
+        return before < o.before;
     }
 };
 
@@ -91,6 +91,31 @@ vector<project> proj;
 map<string, vi> workers;
 vi busy;
 
+void sort_dense(vector<project> &proj) {
+    priority_queue<pair<double,project>> q;
+    sort(all(proj));
+    int sz = si(proj);
+    int last = 0, t = 0;
+    vector<project> ans;
+    const int GAP = 20;
+    while (last < sz) {
+        while (last < sz && proj[last].before < t+GAP) {
+            //double value = proj[last].score / double(proj[last].takes);
+            double value = proj[last].score;
+            q.push(make_pair(value, proj[last]));
+            last++;
+        }
+        while (!q.empty()) {
+            auto [_, p] = q.top(); q.pop();
+            ans.pb(p);
+        }
+        t += GAP;
+    }
+    assert(si(ans) == si(proj));
+    ans = proj;
+}
+
+
 void read_input() {
     cin >> C >> P;
     cont.resize(C);
@@ -104,7 +129,8 @@ void read_input() {
     proj.resize(P);
     for (auto &x : proj) cin >> x;
 
-    sort(all(proj));
+    // sort(all(proj));
+    sort_dense(proj);
 }
 
 const int INF = 1e9;
