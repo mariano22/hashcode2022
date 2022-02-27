@@ -1,9 +1,7 @@
 # [Solution] Hashcode 2022 
 
 We participated on Hashcode 2022 as part of the team **"Mastroventor"**.
-
 At upsolving we reach a 3.388.436 solution (during the contest we had a silly bug and just got 237.060). 
-
 The max score we got on each problem are:
 | A | B | C | D | E | F | 
 | - | - | - | - | - | - |
